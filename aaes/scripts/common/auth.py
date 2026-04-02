@@ -74,10 +74,9 @@ def get_oauth2_token(oauth_cfg: dict[str, Any]) -> str:
         try:
             with urllib.request.urlopen(req, timeout=30) as response:
                 if response.status != 200:
-                    body = response.read().decode('utf-8', errors='replace')
                     if response.status in (400, 401, 403):
-                        raise SkillError("OAUTH_ERROR", f"OAuth2 token refresh failed (auth error): {response.status}", {"status": response.status, "body": body})
-                    raise SkillError("OAUTH_ERROR", f"Failed to refresh OAuth2 token, status: {response.status}", {"status": response.status, "body": body})
+                        raise SkillError("OAUTH_ERROR", f"OAuth2 token refresh failed (auth error): {response.status}", {"status": response.status})
+                    raise SkillError("OAUTH_ERROR", f"Failed to refresh OAuth2 token, status: {response.status}", {"status": response.status})
 
                 token_data = json.loads(response.read().decode("utf-8"))
                 access_token = token_data.get("access_token")

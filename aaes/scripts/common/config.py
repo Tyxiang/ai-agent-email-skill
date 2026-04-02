@@ -1,8 +1,8 @@
-import os
 from pathlib import Path
 from typing import Any
 
 from .errors import SkillError
+from .auth import _detect_auth_type
 
 
 def load_config() -> dict[str, Any]:
@@ -25,22 +25,6 @@ def _get_account_names(config: dict[str, Any]) -> list[str]:
     if not isinstance(accounts, dict) or not accounts:
         return []
     return list(accounts.keys())
-
-
-def _detect_auth_type() -> str | None:
-    """Detect authentication type from environment variables."""
-    has_oauth2 = all([
-        os.environ.get("EMAIL_OAUTH2_CLIENT_ID"),
-        os.environ.get("EMAIL_OAUTH2_CLIENT_SECRET"),
-        os.environ.get("EMAIL_OAUTH2_REFRESH_TOKEN"),
-        os.environ.get("EMAIL_OAUTH2_TOKEN_URL"),
-    ])
-    if has_oauth2:
-        return "oauth2"
-    has_password = os.environ.get("EMAIL_PASSWORD")
-    if has_password:
-        return "password"
-    return None
 
 
 def _get_nested_value(config: dict[str, Any], keys: list[str], default: Any = None) -> Any:

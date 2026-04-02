@@ -17,21 +17,55 @@ def normalize_uids(value: Any) -> str:
     
     # Validate UID format: IMAP UIDs should be digits, '*', or ranges separated by ':'
     # Each UID element can be a single UID or a range (e.g., "123", "*", "1:10")
-    uid_pattern = re.compile(r'^([0-9]+|\*)(:[0-9]+)?$')
+    uid_pattern = re.compile(r'^(\d+|\*)(:\d+)?$')
     
+    normalized_uids = []
     for uid_entry in uids:
         # Split by comma in case a single entry contains multiple UIDs
         for uid in uid_entry.split(','):
             uid = uid.strip()
             if not uid:
                 continue
+            
+            # Validate format
             if not uid_pattern.match(uid):
                 raise SkillError(
                     "VALIDATION_ERROR",
                     f"Invalid UID format: {uid}. UIDs must be numeric, '*', or ranges (e.g., '123', '*', '1:10')"
                 )
+            
+            # Additional validation for ranges
+            if ':' in uid:
+                parts = uid.split(':')
+                if len(parts) != 2:
+                    raise SkillError(
+                        "VALIDATION_ERROR",
+                        f"Invalid UID range: {uid}. Ranges must be in format 'start:end'"
+                    )
+                start, end = parts[0], parts[1]
+                # '*' cannot be used in ranges
+                if start == '*' or not end:
+                    raise SkillError(
+                        "VALIDATION_ERROR",
+                        f"Invalid UID range: {uid}. '*' cannot be used in ranges and both ends must be numeric"
+                    )
+                # Validate range values
+                start_num = int(start)
+                end_num = int(end)
+                if start_num < 1 or end_num < 1:
+                    raise SkillError(
+                        "VALIDATION_ERROR",
+                        f"Invalid UID range: {uid}. UID values must be positive integers"
+                    )
+                if start_num > end_num:
+                    raise SkillError(
+                        "VALIDATION_ERROR",
+                        f"Invalid UID range: {uid}. Start UID must be <= end UID"
+                    )
+            
+            normalized_uids.append(uid)
     
-    return ",".join(uids)
+    return ",".join(normalized_uids)
 
 
 class _HTMLToTextParser(HTMLParser):

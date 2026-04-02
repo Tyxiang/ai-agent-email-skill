@@ -27,7 +27,6 @@ from .smtp_utils import (
     get_smtp_signatures,
     apply_signatures,
     build_message,
-    html_to_text,
     text_to_html,
 )
 from .parsers import (
@@ -38,6 +37,7 @@ from .parsers import (
     guess_attachment_type,
     ensure_body_alternatives,
     _HTMLToTextParser,
+    html_to_text,
     normalize_uids,
 )
 from .protocol import with_runtime, read_request, write_success, write_error, write_unknown_error

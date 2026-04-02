@@ -95,9 +95,18 @@ def validate_folder_name(name: str) -> str:
     
     name = name.strip()
     
+    # Check for control characters (0x00-0x1F)
+    for i, char in enumerate(name):
+        if ord(char) < 0x20:
+            raise SkillError(
+                "VALIDATION_ERROR",
+                f"Folder name contains invalid control character at position {i}",
+                {"folder_name": name, "position": i, "char_code": ord(char)}
+            )
+    
     # Check for dangerous characters that could indicate IMAP injection
     # IMAP uses double quotes for strings and backslash for special flags
-    dangerous_chars = ['"', "\\", "\x00", "\r", "\n"]
+    dangerous_chars = ['"', "\\", "*", "%"]
     for char in dangerous_chars:
         if char in name:
             raise SkillError(
@@ -106,16 +115,26 @@ def validate_folder_name(name: str) -> str:
                 {"folder_name": name}
             )
     
-    # Check for names that look like IMAP commands
-    if name.upper() in ("INBOX", "TRASH", "SENT", "DRAFTS", "SPAM", "JUNK", "ARCHIVE"):
-        # Allow these common names but log a warning
-        pass
-    
-    # Length check - most servers have limits around 255 chars
-    if len(name) > 255:
+    # Check for path traversal attempts
+    if ".." in name or "/" in name:
         raise SkillError(
             "VALIDATION_ERROR",
-            "Folder name too long (max 255 characters)",
+            "Folder name cannot contain path separators",
+            {"folder_name": name}
+        )
+    
+    # Check for names that conflict with IMAP special mailboxes
+    # These are allowed but should be used with caution
+    reserved_names = {"INBOX", "TRASH", "SENT", "DRAFTS", "SPAM", "JUNK", "ARCHIVE"}
+    if name.upper() in reserved_names:
+        # Allow but this is intentional - these are common folder names
+        pass
+    
+    # Length check - RFC 3501 recommends 255 chars max, but we use 100 for safety
+    if len(name) > 100:
+        raise SkillError(
+            "VALIDATION_ERROR",
+            "Folder name too long (max 100 characters)",
             {"length": len(name)}
         )
     

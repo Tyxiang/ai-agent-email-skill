@@ -16,6 +16,8 @@ metadata:
 
 # AI Agent Email Skill (aaes)
 
+## Overview
+
 This skill provides script-based email operations for an agent. It includes functionalities for managing mailboxes, reading/searching emails, sending/replying/forwarding emails, and managing attachments, allowing agents to perform comprehensive email-related tasks programmatically.
 
 ## Features
@@ -52,10 +54,10 @@ Use this skill when you need an agent to:
 
 ### Basic Setup
 
-Configure this skill with `./config.toml`:
+Configure this skill with `./scripts/config.toml`:
 
-1. Copy `./config.default.toml` to `./config.toml`
-2. Edit `./config.toml` - fill in email address and server addresses
+1. Copy `./config.default.toml` to `./scripts/config.toml`.
+2. Edit `./scripts/config.toml` - fill in email address and server addresses.
 
 ### Authentication Setup
 

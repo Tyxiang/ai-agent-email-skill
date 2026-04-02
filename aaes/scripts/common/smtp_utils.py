@@ -3,59 +3,13 @@ import ssl
 import sys
 import json
 import html
-import re
 from email.message import EmailMessage
 from email.utils import formataddr, parseaddr
-from html.parser import HTMLParser
 from typing import Any
 
 from .errors import SkillError
 from .auth import _detect_auth_type, _get_password_from_env, _get_username_from_env, _get_oauth2_from_env, get_oauth2_token
-
-
-class _HTMLToTextParser(HTMLParser):
-    _BLOCK_TAGS = {"p", "div", "br", "li", "tr", "table", "section", "article"}
-
-    def __init__(self) -> None:
-        super().__init__()
-        self._parts: list[str] = []
-        self._ignore_depth = 0
-
-    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
-        del attrs
-        normalized = tag.lower()
-        if normalized in {"script", "style"}:
-            self._ignore_depth += 1
-            return
-        if normalized in self._BLOCK_TAGS:
-            self._parts.append("\n")
-
-    def handle_endtag(self, tag: str) -> None:
-        normalized = tag.lower()
-        if normalized in {"script", "style"} and self._ignore_depth:
-            self._ignore_depth -= 1
-            return
-        if normalized in self._BLOCK_TAGS:
-            self._parts.append("\n")
-
-    def handle_data(self, data: str) -> None:
-        if self._ignore_depth or not data:
-            return
-        self._parts.append(data)
-
-    def get_text(self) -> str:
-        combined = "".join(self._parts)
-        combined = combined.replace("\r\n", "\n").replace("\r", "\n")
-        combined = re.sub(r"\n{3,}", "\n\n", combined)
-        return "\n".join(line.rstrip() for line in combined.splitlines()).strip()
-
-
-def html_to_text(value: str) -> str:
-    parser = _HTMLToTextParser()
-    parser.feed(value)
-    parser.close()
-    text = html.unescape(parser.get_text())
-    return re.sub(r"[ \t]+", " ", text).strip()
+from .parsers import html_to_text
 
 
 def text_to_html(value: str) -> str:
