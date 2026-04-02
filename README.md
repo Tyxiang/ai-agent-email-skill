@@ -10,7 +10,6 @@ See [SKILL.md](aaes/SKILL.md)
 aaes/                       # Skill about
   SKILL.md                  # Skill documentation
   config.default.toml       # Default config file (copy to config.toml).
-  config.toml               # Local runtime config (gitignored).
   scripts/
     common/                 # Shared utilities (modular package).
     folder_*.py             # Folder management scripts.
