@@ -5,12 +5,10 @@ metadata:
   openclaw:
     requires:
       env:
-        - EMAIL_USERNAME
         - EMAIL_PASSWORD
-        - EMAIL_OAUTH2_CLIENT_ID
-        - EMAIL_OAUTH2_CLIENT_SECRET
-        - EMAIL_OAUTH2_REFRESH_TOKEN
-        - EMAIL_OAUTH2_TOKEN_URL
+        - EMAIL_USERNAME
+      config:
+        - ./scripts/config.toml
     primaryEnv: EMAIL_PASSWORD
 ---
 
@@ -61,14 +59,14 @@ Configure this skill with `./scripts/config.toml`:
 
 ### Authentication Setup
 
-Authentication is automatically detected from environment variables. OAuth2 takes priority over password.
+Only one authentication method is required, Password-based or OAuth2. 
 
-**Password-based authentication:**
+**Password-based authentication**
 
-| Variable         | Description                                  |
-| ---------------- | -------------------------------------------- |
-| `EMAIL_USERNAME` | Login username (optional, defaults to email) |
-| `EMAIL_PASSWORD` | User password or app password                |
+| Variable         | Description                           |
+| ---------------- | ------------------------------------- |
+| `EMAIL_USERNAME` | Login username (required)             |
+| `EMAIL_PASSWORD` | User password or app password         |
 
 ```bash
 # Linux/Mac
@@ -84,7 +82,7 @@ set EMAIL_USERNAME=me
 set EMAIL_PASSWORD=my-password
 ```
 
-**OAuth2 authentication:**
+**OAuth2 authentication**
 
 | Variable                     | Description               |
 | ---------------------------- | ------------------------- |
@@ -510,9 +508,10 @@ echo '{"requestId":"test","schemaVersion":"1.0","data":{"maxResults":10}}' | pyt
 
 ### AUTH_ERROR
 
-- Ensure environment variables are set correctly
-- For 2FA accounts, use app password (`EMAIL_APP_PASSWORD`)
-- OAuth2 requires all four `EMAIL_OAUTH2_*` variables
+- If password auth: Ensure both `EMAIL_USERNAME` and `EMAIL_PASSWORD` are set
+- If OAuth2 auth: All four variables required: `EMAIL_OAUTH2_CLIENT_ID`, `EMAIL_OAUTH2_CLIENT_SECRET`, `EMAIL_OAUTH2_REFRESH_TOKEN`, `EMAIL_OAUTH2_TOKEN_URL`
+- For 2FA accounts, use app password for `EMAIL_PASSWORD`
+- OAuth2 takes priority if all four `EMAIL_OAUTH2_*` variables are set
 
 ### NETWORK_ERROR
 
