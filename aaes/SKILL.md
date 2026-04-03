@@ -59,7 +59,7 @@ Configure this skill with `./scripts/config.toml`:
 
 ### Authentication Setup
 
-Only one authentication method is required, Password-based or OAuth2. 
+Only one authentication method is required, configured via environment variables. 
 
 **Password-based authentication**
 
